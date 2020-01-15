@@ -2,12 +2,12 @@ package life.majiang.community.community.mode;
 
 public class User {
     private int id;
-    private String accountId;
+    private String account_id;
     private String name;
     private String token;
     private String bio;
-    private long gmtCreate;
-    private long gmtModified;
+    private long gmt_create;
+    private long gmt_modified;
 
     public int getId() {
         return id;
@@ -17,12 +17,12 @@ public class User {
         this.id = id;
     }
 
-    public String getAccountId() {
-        return accountId;
+    public String getAccount_id() {
+        return account_id;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
+    public void setAccount_id(String account_id) {
+        this.account_id = account_id;
     }
 
     public String getName() {
@@ -49,32 +49,32 @@ public class User {
         this.bio = bio;
     }
 
-    public long getGmtCreate() {
-        return gmtCreate;
+    public long getGmt_create() {
+        return gmt_create;
     }
 
-    public void setGmtCreate(long gmtCreate) {
-        this.gmtCreate = gmtCreate;
+    public void setGmt_create(long gmt_create) {
+        this.gmt_create = gmt_create;
     }
 
-    public long getGmtModified() {
-        return gmtModified;
+    public long getGmt_modified() {
+        return gmt_modified;
     }
 
-    public void setGmtModified(long gmtModified) {
-        this.gmtModified = gmtModified;
+    public void setGmt_modified(long gmt_modified) {
+        this.gmt_modified = gmt_modified;
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", accountId='" + accountId + '\'' +
+                ", account_id='" + account_id + '\'' +
                 ", name='" + name + '\'' +
                 ", token='" + token + '\'' +
                 ", bio='" + bio + '\'' +
-                ", gmtCreate=" + gmtCreate +
-                ", gmtModified=" + gmtModified +
+                ", gmt_create=" + gmt_create +
+                ", gmt_modified=" + gmt_modified +
                 '}';
     }
 }
