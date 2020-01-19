@@ -1,6 +1,6 @@
 package life.majiang.community.community.controller;
 
-import life.majiang.community.community.mapper.PublishMapper;
+import life.majiang.community.community.mapper.QuestionMapper;
 import life.majiang.community.community.mapper.UserMapper;
 import life.majiang.community.community.mode.Question;
 import life.majiang.community.community.mode.User;
@@ -21,7 +21,7 @@ public class PublishController {
     UserMapper userMapper;
 
     @Autowired
-    PublishMapper publishMapper;
+    QuestionMapper questionMapper;
 
     @GetMapping("/publish")
     public String publish(){
@@ -76,7 +76,7 @@ public class PublishController {
         question.setTitle(title);
         question.setGmtCreate(System.currentTimeMillis());
         question.setGmtModified(question.getGmtCreate());
-        publishMapper.create(question);
+        questionMapper.create(question);
         return "redirect:/";
     }
 }
