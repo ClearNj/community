@@ -19,6 +19,7 @@ public class QuestionService {
     UserMapper userMapper;
     @Autowired
     QuestionMapper questionMapper;
+    //首页查询
     public PageinationDto list(Integer page, Integer size) {
         //size*(page-1)
         Integer offset = size*(page-1);
@@ -34,6 +35,25 @@ public class QuestionService {
         }
         pageinationDto.setQuestions(questionDtoList);
         Integer totalCount = questionMapper.count();
+        pageinationDto.setPageination(totalCount,page,size);
+        return pageinationDto;
+    }
+    //个人页面查询
+    public PageinationDto list(int userId, Integer page, Integer size) {
+        //size*(page-1)
+        Integer offset = size*(page-1);
+        List<Question> questions = questionMapper.listByUserId(userId,offset,size);
+        List<QuestionDto> questionDtoList = new ArrayList<>();
+        PageinationDto pageinationDto = new PageinationDto();
+        for(Question question : questions){
+            User user = userMapper.findById(question.getCreator());
+            QuestionDto questionDto = new QuestionDto();
+            BeanUtils.copyProperties(question,questionDto);
+            questionDto.setUser(user);
+            questionDtoList.add(questionDto);
+        }
+        pageinationDto.setQuestions(questionDtoList);
+        Integer totalCount = questionMapper.countByUserId(userId);
         pageinationDto.setPageination(totalCount,page,size);
         return pageinationDto;
     }
