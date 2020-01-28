@@ -66,4 +66,18 @@ public class QuestionService {
         questionDto.setUser(user);
         return questionDto;
     }
+
+    public void createUpdate(Question question) {
+        if (question.getId()>0){
+            //更新
+            question.setGmtModified(System.currentTimeMillis());
+            questionMapper.update(question);
+        }else{
+            //创建
+            question.setGmtCreate(System.currentTimeMillis());
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.create(question);
+
+        }
+    }
 }
