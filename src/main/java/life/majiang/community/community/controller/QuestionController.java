@@ -2,7 +2,6 @@ package life.majiang.community.community.controller;
 
 import life.majiang.community.community.Service.QuestionService;
 import life.majiang.community.community.dto.QuestionDto;
-import life.majiang.community.community.mode.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +18,7 @@ public class QuestionController {
                             Model model){
         QuestionDto questionDto = questionService.getById(id);
         model.addAttribute("question",questionDto);
+        questionService.incView(id);
         return "question";
     }
 }

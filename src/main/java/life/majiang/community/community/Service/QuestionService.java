@@ -2,6 +2,9 @@ package life.majiang.community.community.Service;
 
 import life.majiang.community.community.dto.PageinationDto;
 import life.majiang.community.community.dto.QuestionDto;
+import life.majiang.community.community.exception.CustomizeErrorCode;
+import life.majiang.community.community.exception.CustomizeException;
+import life.majiang.community.community.mapper.QuestionExtMapper;
 import life.majiang.community.community.mapper.QuestionMapper;
 import life.majiang.community.community.mapper.UserMapper;
 import life.majiang.community.community.mode.Question;
@@ -21,6 +24,8 @@ public class QuestionService {
     UserMapper userMapper;
     @Autowired
     QuestionMapper questionMapper;
+    @Autowired
+    QuestionExtMapper questionExtMapper;
     //首页查询
     public PageinationDto list(Integer page, Integer size) {
         //size*(page-1)
@@ -66,6 +71,9 @@ public class QuestionService {
 
     public QuestionDto getById(Integer id) {
         Question question = questionMapper.selectByPrimaryKey(id);
+        if (question==null){
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         QuestionDto questionDto = new QuestionDto();
         BeanUtils.copyProperties(question,questionDto);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
@@ -83,7 +91,10 @@ public class QuestionService {
             updateQuestion.setGmtModified(System.currentTimeMillis());
             QuestionExample questionExample = new QuestionExample();
             questionExample.createCriteria().andIdEqualTo(question.getId());
-            questionMapper.updateByExampleSelective(updateQuestion,questionExample);
+            int update = questionMapper.updateByExampleSelective(updateQuestion, questionExample);
+            if (update !=1){
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }else{
             //创建
             question.setGmtCreate(System.currentTimeMillis());
@@ -91,5 +102,13 @@ public class QuestionService {
             questionMapper.insert(question);
 
         }
+    }
+    //增加阅读数
+    public void incView(Integer id) {
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
+
     }
 }
