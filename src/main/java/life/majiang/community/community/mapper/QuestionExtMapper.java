@@ -4,4 +4,5 @@ import life.majiang.community.community.mode.Question;
 
 public interface QuestionExtMapper {
     int incView(Question recode);
+    int incCommentCount(Question recode);
 }
