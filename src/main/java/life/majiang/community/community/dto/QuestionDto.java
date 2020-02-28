@@ -2,7 +2,6 @@ package life.majiang.community.community.dto;
 
 import life.majiang.community.community.mode.User;
 import lombok.Data;
-
 @Data
 public class QuestionDto {
     private long id;

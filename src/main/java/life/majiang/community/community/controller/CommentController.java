@@ -38,7 +38,7 @@ public class CommentController {
         comment.setParentId(commentDto.getParentId());
         comment.setLikeCount(0L);
         comment.setCommentCount(0);
-        commentService.insert(comment);
+        commentService.insert(comment,user);
         return ResultDto.okof();
     }
 

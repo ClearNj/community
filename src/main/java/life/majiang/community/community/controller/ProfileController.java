@@ -1,7 +1,9 @@
 package life.majiang.community.community.controller;
 
+import life.majiang.community.community.Service.NotificationService;
 import life.majiang.community.community.Service.QuestionService;
 import life.majiang.community.community.dto.PageinationDto;
+import life.majiang.community.community.mapper.NotificationMapper;
 import life.majiang.community.community.mapper.UserMapper;
 import life.majiang.community.community.mode.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ public class ProfileController {
     UserMapper userMapper;
     @Autowired
     QuestionService questionService;
+    @Autowired
+    NotificationService notificationService;
         @RequestMapping("/profile/{action}")
         public String profile (@PathVariable(name = "action") String action,
                                HttpServletRequest request,
@@ -32,13 +36,17 @@ public class ProfileController {
             if ("questions".equals(action)){
                 model.addAttribute("section","questions");
                 model.addAttribute("sectionName","我的提问");
+                //查询个人发布
+                PageinationDto pageinationDto = questionService.list(user.getId(), page, size);
+                model.addAttribute("pageination",pageinationDto);
             }else if ("replies".equals(action)){
+                //最新回复
+                PageinationDto pageinationDto = notificationService.list(user.getId(), page, size);
                 model.addAttribute("section","replies");
+                model.addAttribute("pageination",pageinationDto);
                 model.addAttribute("sectionName","最新回复");
             }
-            //查询个人发布
-            PageinationDto pageinationDto = questionService.list(user.getId(), page, size);
-            model.addAttribute("pageination",pageinationDto);
+
             return "profile";
         }
 }

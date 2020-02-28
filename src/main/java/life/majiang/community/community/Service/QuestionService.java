@@ -2,6 +2,7 @@ package life.majiang.community.community.Service;
 
 import life.majiang.community.community.dto.PageinationDto;
 import life.majiang.community.community.dto.QuestionDto;
+import life.majiang.community.community.dto.QuestionQueryDTO;
 import life.majiang.community.community.exception.CustomizeErrorCode;
 import life.majiang.community.community.exception.CustomizeException;
 import life.majiang.community.community.mapper.QuestionExtMapper;
@@ -14,9 +15,13 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
@@ -27,12 +32,19 @@ public class QuestionService {
     @Autowired
     QuestionExtMapper questionExtMapper;
     //首页查询
-    public PageinationDto list(Integer page, Integer size) {
-        //size*(page-1)
+    public PageinationDto list(String search, Integer page, Integer size) {
+        //分割搜索内容
+        if(StringUtils.isNoneBlank(search)){
+            String[] tags = StringUtils.split(search," ");
+            search = Arrays.stream(tags).collect(Collectors.joining("|"));
+        }
+        //分页，size*(page-1)
         Integer offset = size*(page-1);
-        QuestionExample questionExample = new QuestionExample();
-        questionExample.setOrderByClause("gmt_create desc");
-        List<Question> questions = questionMapper.selectByExampleWithRowbounds(questionExample, new RowBounds(offset, size));
+        QuestionQueryDTO questionQueryDTO = new QuestionQueryDTO();
+        questionQueryDTO.setPage(offset);
+        questionQueryDTO.setSize(size);
+        questionQueryDTO.setSearch(search);
+        List<Question> questions = questionExtMapper.selectBySearch(questionQueryDTO);
         List<QuestionDto> questionDtoList = new ArrayList<>();
         PageinationDto pageinationDto = new PageinationDto();
         for(Question question : questions){
@@ -42,8 +54,9 @@ public class QuestionService {
             questionDto.setUser(user);
             questionDtoList.add(questionDto);
         }
-        pageinationDto.setQuestions(questionDtoList);
-        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
+        pageinationDto.setData(questionDtoList);
+       //查询总数
+        Integer totalCount = questionExtMapper.countBySearch(questionQueryDTO);
         pageinationDto.setPageination(totalCount,page,size);
         return pageinationDto;
     }
@@ -63,7 +76,7 @@ public class QuestionService {
             questionDto.setUser(user);
             questionDtoList.add(questionDto);
         }
-        pageinationDto.setQuestions(questionDtoList);
+        pageinationDto.setData(questionDtoList);
         QuestionExample questionExample1 = new QuestionExample();
         questionExample.createCriteria().andCreatorEqualTo(userId);
         Integer totalCount =(int) questionMapper.countByExample(questionExample1);
@@ -115,5 +128,26 @@ public class QuestionService {
         question.setViewCount(1);
         questionExtMapper.incView(question);
 
+    }
+
+    //关联标签
+    public List<QuestionDto> selectRelated(QuestionDto questionDto) {
+        //分割标签
+        if(StringUtils.isBlank(questionDto.getTag())){
+            return new ArrayList<>();
+        }
+        String[] tags = StringUtils.split(questionDto.getTag(),",");
+        String regexpTag = Arrays.stream(tags).collect(Collectors.joining("|"));
+        Question question = new Question();
+        question.setId(questionDto.getId());
+        question.setTag(regexpTag);
+
+        List<Question> questions = questionExtMapper.selectRelated(question);
+        List<QuestionDto> questionDtos = questions.stream().map(q -> {
+            QuestionDto questionDto1 = new QuestionDto();
+            BeanUtils.copyProperties(q, questionDto1);
+            return questionDto1;
+        }).collect(Collectors.toList());
+        return questionDtos;
     }
 }
