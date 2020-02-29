@@ -32,7 +32,7 @@ public class QuestionService {
     @Autowired
     QuestionExtMapper questionExtMapper;
     //首页查询
-    public PageinationDto list(String search, Integer page, Integer size) {
+    public PageinationDto list(String search,String tag,Integer page, Integer size) {
         //分割搜索内容
         if(StringUtils.isNoneBlank(search)){
             String[] tags = StringUtils.split(search," ");
@@ -44,6 +44,11 @@ public class QuestionService {
         questionQueryDTO.setPage(offset);
         questionQueryDTO.setSize(size);
         questionQueryDTO.setSearch(search);
+        //添加搜索标签
+        if (StringUtils.isNotBlank(tag)) {
+            tag = tag.replace("+", "").replace("*", "").replace("?", "");
+            questionQueryDTO.setTag(tag);
+        }
         List<Question> questions = questionExtMapper.selectBySearch(questionQueryDTO);
         List<QuestionDto> questionDtoList = new ArrayList<>();
         PageinationDto pageinationDto = new PageinationDto();
